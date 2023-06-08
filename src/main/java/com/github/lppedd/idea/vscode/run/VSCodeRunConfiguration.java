@@ -11,7 +11,6 @@ import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.ExecutionUtil;
-import com.intellij.javascript.debugger.LocalFileSystemFileFinder;
 import com.intellij.javascript.debugger.RemoteDebuggingFileFinder;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.SettingsEditor;
@@ -109,9 +108,9 @@ public class VSCodeRunConfiguration
       return null;
     });
 
-    final var fileFinder = new LocalFileSystemFileFinder();
-    final var finder = new RemoteDebuggingFileFinder(ImmutableBiMap.of(), fileFinder);
-    final var process = new VSCodeDebugProcess(session, finder, connection, executionResult);
+    final var fileFinder = new VSCodeLocalFileSystemFileFinder();
+    final var remoteFileFinder = new RemoteDebuggingFileFinder(ImmutableBiMap.of(), fileFinder);
+    final var process = new VSCodeDebugProcess(session, remoteFileFinder, connection, executionResult);
     connection.open(socketAddress, null);
     return process;
   }
