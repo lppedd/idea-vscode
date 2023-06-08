@@ -7,6 +7,8 @@ Provides a Run/Debug Configuration to easily test your VS Code extension inside 
 - Uses remote debugging, which is slower than native VS Code debugging
 - Debugger does not work immediately after invoking _Reload Window_
 - Cannot debug tests
+- _Before launch_ tasks are blocking, so we cannot use `npm watch` (never terminates).  
+  I'll have to think how to work around this.
 
 ## Requirements
 
