@@ -1,11 +1,11 @@
-# VS Code Development
+# VS Code Development Support
 
 Provides a Run/Debug Configuration to easily test your VS Code extension inside of IntelliJ IDEA.
 
 ## Current limitations
 
 - Uses remote debugging, which is slower than native VS Code debugging
-- Debugger does work immediately after invoking _Reload Window_
+- Debugger does not work immediately after invoking _Reload Window_
 - Cannot debug tests
 
 ## Instructions
