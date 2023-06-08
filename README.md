@@ -10,6 +10,8 @@ Provides a Run/Debug Configuration to easily test your VS Code extension inside 
 - _Before launch_ tasks are blocking, so we cannot use `npm watch` (never terminates).  
   I'll have to think how to work around this.
 
+See also: https://youtrack.jetbrains.com/issue/WEB-61430
+
 ## Requirements
 
 The plugin needs JavaScript and NodeJS support, and because of that IntelliJ IDEA Community is not supported.
