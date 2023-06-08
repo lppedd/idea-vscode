@@ -16,10 +16,10 @@ The plugin needs JavaScript and NodeJS support, and because of that IntelliJ IDE
 
 ## Instructions
 
-- Create a VS Code Run Configuration
+1. Create a VS Code Run Configuration
 
-  ![](.github/images/new-run-config.png "New VS Code Run Configuration")
+   ![](.github/images/new-run-config.png "New VS Code Run Configuration")
 
-- Select the path of your local VS Code installation, and the IDE module containing the extension
+2. Select the path of your local VS Code installation, and the project's module containing the extension
 
-  ![](.github/images/edit-run-config.png "Edit VS Code Run Configuration")
+   ![](.github/images/edit-run-config.png "Edit VS Code Run Configuration")
