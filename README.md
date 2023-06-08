@@ -8,6 +8,10 @@ Provides a Run/Debug Configuration to easily test your VS Code extension inside 
 - Debugger does not work immediately after invoking _Reload Window_
 - Cannot debug tests
 
+## Requirements
+
+The plugin needs JavaScript and NodeJS support, and because of that IntelliJ IDEA Community is not supported.
+
 ## Instructions
 
 - Create a VS Code Run Configuration
