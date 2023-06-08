@@ -1,0 +1,15 @@
+<idea-plugin>
+  <id>com.github.lppedd.idea-vscode</id>
+  <name>VS Code Development Support</name>
+  <vendor email="lp.edoardo@gmail.com" url="https://github.com/lppedd/idea-vscode">Edoardo Luppi</vendor>
+  <description><![CDATA[
+  Allows starting and debugging Extension Host sessions in a similar way to native VS Code.
+  ]]></description>
+
+  <depends>com.intellij.modules.platform</depends>
+  <depends>NodeJS</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <configurationType id="LppeddIdeaVSCode" implementation="com.github.lppedd.idea.vscode.run.VSCodeConfigurationType"/>
+  </extensions>
+</idea-plugin>
