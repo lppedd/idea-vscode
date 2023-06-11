@@ -39,6 +39,6 @@ public class VSCodeSettingsEditor extends SettingsEditor<VSCodeRunConfiguration>
 
   @Override
   protected void disposeEditor() {
-    disposable.dispose();
+    Disposer.dispose(disposable);
   }
 }
