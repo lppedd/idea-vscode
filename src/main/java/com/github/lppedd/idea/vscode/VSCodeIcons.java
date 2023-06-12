@@ -12,9 +12,13 @@ public class VSCodeIcons {
   /**
    * VS Code logo, 16x16 px.
    */
-  public static final Icon LOGO_16 = getIcon("/icons/vscode.svg");
+  public static final Icon VSCODE_16 = getIcon("/icons/vscode.svg");
 
-  @SuppressWarnings("SameParameterValue")
+  /**
+   * NPM logo, 16x16 px.
+   */
+  public static final Icon NPM_16 = getIcon("/icons/npm.svg");
+
   private static @NotNull Icon getIcon(@NotNull final String path) {
     return IconLoader.getIcon(path, VSCodeIcons.class);
   }

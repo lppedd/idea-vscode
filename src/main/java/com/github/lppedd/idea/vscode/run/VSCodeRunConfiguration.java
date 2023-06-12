@@ -1,5 +1,6 @@
 package com.github.lppedd.idea.vscode.run;
 
+import com.github.lppedd.idea.vscode.VSCodeSessionManager;
 import com.github.lppedd.idea.vscode.run.debug.VSCodeDebugProcess;
 import com.github.lppedd.idea.vscode.run.states.VSCodeCommandLineRunState;
 import com.github.lppedd.idea.vscode.run.states.VSCodeContinuationState;
@@ -26,6 +27,9 @@ import org.jetbrains.debugger.DebuggableRunConfiguration;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Edoardo Luppi
@@ -33,8 +37,8 @@ import java.net.InetSocketAddress;
 public class VSCodeRunConfiguration
     extends RunConfigurationBase<VSCodeRunConfigurationOptions>
     implements DebuggableRunConfiguration, RemoteRunProfile {
-  private volatile boolean isReloading;
-  private volatile ExecutionResult lastExecutionResult;
+  private final AtomicBoolean isReloading = new AtomicBoolean();
+  private final AtomicReference<ExecutionResult> lastExecutionResult = new AtomicReference<>();
 
   public VSCodeRunConfiguration(
       @NotNull final Project project,
@@ -70,9 +74,8 @@ public class VSCodeRunConfiguration
   public RunProfileState getState(
       @NotNull final Executor executor,
       @NotNull final ExecutionEnvironment environment) throws ExecutionException {
-    if (isReloading) {
-      final var newExecutionResult = ((VSCodeExecutionResult) lastExecutionResult).copy(executor);
-      return new VSCodeContinuationState(newExecutionResult);
+    if (isReloading.compareAndSet(true, false)) {
+      return new VSCodeContinuationState(((VSCodeExecutionResult) lastExecutionResult.get()).copy(executor));
     }
 
     return new VSCodeCommandLineRunState(this, executor, environment);
@@ -93,16 +96,12 @@ public class VSCodeRunConfiguration
       @NotNull final XDebugSession session,
       @Nullable final ExecutionResult executionResult,
       @NotNull final ExecutionEnvironment environment) {
-    if (isReloading) {
-      isReloading = false;
-    }
-
     final var connection = new WipWithExclusiveWebsocketChannelVmConnection();
     connection.stateChanged(connectionState -> {
       final var status = connectionState.getStatus();
 
       if (status == ConnectionStatus.DISCONNECTED || status == ConnectionStatus.DETACHED) {
-        onConnectionDisconnected(session, executionResult);
+        onConnectionDisconnected(environment, Objects.requireNonNull(executionResult));
       }
 
       return null;
@@ -116,17 +115,13 @@ public class VSCodeRunConfiguration
   }
 
   private void onConnectionDisconnected(
-      @NotNull final XDebugSession session,
-      @Nullable final ExecutionResult executionResult) {
-    final var processHandler = (VSCodeProcessHandler) session.getDebugProcess().getProcessHandler();
+      @NotNull final ExecutionEnvironment executionEnvironment,
+      @NotNull final ExecutionResult executionResult) {
+    final var processHandler = (VSCodeProcessHandler) executionResult.getProcessHandler();
 
     if (processHandler.isProcessTerminatedInternal() || processHandler.isProcessTerminatingInternal()) {
-      isReloading = false;
       return;
     }
-
-    isReloading = true;
-    lastExecutionResult = executionResult;
 
     // Mark this ProcessHandler as terminated (even if the underlying process is still alive)
     // so that it doesn't interfere with the restart.
@@ -143,7 +138,16 @@ public class VSCodeRunConfiguration
       }
 
       // Restart the entire Run Configuration
-      AppUIUtil.invokeOnEdt(() -> ExecutionUtil.restart(session.getRunContentDescriptor()));
+      AppUIUtil.invokeOnEdt(() -> {
+        if (!VSCodeSessionManager.getInstance().isShutDown(processHandler)) {
+          if (!isReloading.compareAndSet(false, true)) {
+            throw new IllegalStateException("Expected 'false' for isReloading");
+          }
+
+          lastExecutionResult.set(executionResult);
+          ExecutionUtil.restart(executionEnvironment);
+        }
+      });
     });
   }
 }

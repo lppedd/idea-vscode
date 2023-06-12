@@ -1,5 +1,6 @@
 package com.github.lppedd.idea.vscode.run.states;
 
+import com.github.lppedd.idea.vscode.VSCodeSessionManager;
 import com.github.lppedd.idea.vscode.VSCodeUtils;
 import com.github.lppedd.idea.vscode.run.VSCodeProcessHandler;
 import com.github.lppedd.idea.vscode.run.VSCodeRunConfiguration;
@@ -51,6 +52,11 @@ public class VSCodeCommandLineRunState extends CommandLineState implements Debug
   }
 
   @Override
+  protected @Nullable ConsoleView createConsole(@NotNull final Executor executor) {
+    throw new UnsupportedOperationException("This should never be called. See createConsoleInternal");
+  }
+
+  @Override
   public @NotNull Promise<ExecutionResult> execute(final int debugPort) {
     try {
       return Promises.resolvedPromise(executeInternal(executor, debugPort));
@@ -66,16 +72,29 @@ public class VSCodeCommandLineRunState extends CommandLineState implements Debug
     return executeInternal(executor, NO_DEBUG);
   }
 
-  @Override
-  public @Nullable ConsoleView createConsole(@NotNull final Executor executor) throws ExecutionException {
-    return super.createConsole(executor);
+  public @Nullable ConsoleView createConsoleInternal(
+      @NotNull final Executor executor,
+      @NotNull final VSCodeProcessHandler processHandler) throws ExecutionException {
+    final var console = super.createConsole(executor);
+
+    if (console != null) {
+      console.addMessageFilter((line, entireLength) -> {
+        if (line.contains("Lifecycle#onWillShutdown")) {
+          VSCodeSessionManager.getInstance().setShutDown(processHandler);
+        }
+
+        return null;
+      });
+    }
+
+    return console;
   }
 
   private @NotNull VSCodeExecutionResult executeInternal(
       @NotNull final Executor executor,
       final int debugPort) throws ExecutionException {
     final var processHandler = startProcessInternal(debugPort);
-    final var console = createConsole(executor);
+    final var console = createConsoleInternal(executor, processHandler);
     final AnAction[] actions;
 
     if (console != null) {

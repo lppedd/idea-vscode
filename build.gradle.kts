@@ -16,7 +16,7 @@ intellij {
   type.set("IU")
   downloadSources.set(true)
   pluginName.set("idea-vscode")
-  plugins.set(listOf("java", "JavaScript", "nodeJS"))
+  plugins.set(listOf("JavaScript", "nodeJS"))
 }
 
 tasks {

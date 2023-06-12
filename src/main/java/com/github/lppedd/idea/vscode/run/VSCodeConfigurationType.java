@@ -27,7 +27,7 @@ public class VSCodeConfigurationType implements ConfigurationType, DumbAware {
 
   @Override
   public @NotNull Icon getIcon() {
-    return VSCodeIcons.LOGO_16;
+    return VSCodeIcons.VSCODE_16;
   }
 
   @Override

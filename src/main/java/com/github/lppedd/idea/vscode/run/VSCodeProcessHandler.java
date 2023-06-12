@@ -5,27 +5,30 @@ import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.ColoredProcessHandler;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * @author Edoardo Luppi
  */
 public class VSCodeProcessHandler extends ColoredProcessHandler {
+  private final AtomicBoolean isTerminated = new AtomicBoolean();
+  private final AtomicBoolean isDestroyed = new AtomicBoolean();
   private final GeneralCommandLine commandLine;
-  private volatile boolean isTerminated;
-  private volatile boolean isDestroyed;
 
   public VSCodeProcessHandler(@NotNull final GeneralCommandLine commandLine) throws ExecutionException {
     super(commandLine);
     this.commandLine = commandLine;
   }
 
-  @SuppressWarnings("CopyConstructorMissesField")
   public VSCodeProcessHandler(@NotNull final VSCodeProcessHandler processHandler) {
     super(processHandler.getProcess(), processHandler.commandLine);
     this.commandLine = processHandler.commandLine;
   }
 
   public void setTerminated() {
-    isTerminated = true;
+    if (!isTerminated.compareAndSet(false, true)) {
+      throw new IllegalStateException("Expected 'false' for isTerminated");
+    }
   }
 
   public boolean isProcessTerminatedInternal() {
@@ -38,18 +41,20 @@ public class VSCodeProcessHandler extends ColoredProcessHandler {
 
   @Override
   public boolean isProcessTerminated() {
-    return isDestroyed || super.isProcessTerminated();
+    return isDestroyed.get() || super.isProcessTerminated();
   }
 
   @Override
   public boolean isProcessTerminating() {
-    return isDestroyed || super.isProcessTerminating();
+    return isDestroyed.get() || super.isProcessTerminating();
   }
 
   @Override
   public void destroyProcess() {
-    if (isTerminated) {
-      isDestroyed = true;
+    if (isTerminated.get()) {
+      if (!isDestroyed.compareAndSet(false, true)) {
+        throw new IllegalStateException("Expected 'false' for isDestroyed");
+      }
     } else {
       super.destroyProcess();
     }

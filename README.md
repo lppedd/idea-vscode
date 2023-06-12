@@ -25,3 +25,8 @@ The plugin needs JavaScript and NodeJS support, and because of that IntelliJ IDE
 2. Select the path of your local VS Code installation, and the project's module containing the extension
 
    ![](.github/images/edit-run-config.png "Edit VS Code Run Configuration")
+
+3. Optionally configure _Before launch_ tasks.  
+   It is important to select _background_ tasks (plugin specific), which do not block the Run Configuration execution.
+
+   ![](.github/images/before-launch.png "Add Before Launch Tasks")

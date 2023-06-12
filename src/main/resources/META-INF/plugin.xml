@@ -11,5 +11,15 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <configurationType id="LppeddIdeaVSCode" implementation="com.github.lppedd.idea.vscode.run.VSCodeConfigurationType"/>
+    <stepsBeforeRunProvider order="first" implementation="com.github.lppedd.idea.vscode.npm.VSCodeNpmBeforeRunTaskProvider"/>
+
+    <applicationService
+        serviceInterface="com.github.lppedd.idea.vscode.VSCodeSessionManager"
+        serviceImplementation="com.github.lppedd.idea.vscode.DefaultVSCodeSessionManager"
+    />
+    <applicationService
+        serviceInterface="com.github.lppedd.idea.vscode.npm.VSCodeNpmTaskManager"
+        serviceImplementation="com.github.lppedd.idea.vscode.npm.DefaultVSCodeNpmTaskManager"
+    />
   </extensions>
 </idea-plugin>

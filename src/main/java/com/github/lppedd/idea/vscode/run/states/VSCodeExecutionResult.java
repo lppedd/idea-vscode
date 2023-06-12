@@ -32,15 +32,15 @@ public class VSCodeExecutionResult extends DefaultExecutionResult {
     return debugPort;
   }
 
-  public @NotNull VSCodeExecutionResult copy(final @NotNull Executor executor) throws ExecutionException {
-    final var console = state.createConsole(executor);
+  public @NotNull VSCodeExecutionResult copy(@NotNull final Executor executor) throws ExecutionException {
     final var oldProcessHandler = (VSCodeProcessHandler) getProcessHandler();
+    final var newProcessHandler = new VSCodeProcessHandler(oldProcessHandler);
+    final var console = state.createConsoleInternal(executor, newProcessHandler);
 
     if (console != null) {
       console.attachToProcess(oldProcessHandler);
     }
 
-    final var newProcessHandler = new VSCodeProcessHandler(oldProcessHandler);
     return new VSCodeExecutionResult(state, debugPort, console, newProcessHandler, getActions());
   }
 }
