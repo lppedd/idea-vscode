@@ -5,14 +5,12 @@ import com.github.lppedd.idea.vscode.run.debug.VSCodeDebugProcess;
 import com.github.lppedd.idea.vscode.run.states.VSCodeCommandLineRunState;
 import com.github.lppedd.idea.vscode.run.states.VSCodeContinuationState;
 import com.github.lppedd.idea.vscode.run.states.VSCodeExecutionResult;
-import com.google.common.collect.ImmutableBiMap;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.ExecutionResult;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.ExecutionUtil;
-import com.intellij.javascript.debugger.RemoteDebuggingFileFinder;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
@@ -20,7 +18,8 @@ import com.intellij.ui.AppUIUtil;
 import com.intellij.util.io.socketConnection.ConnectionStatus;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
-import com.jetbrains.debugger.wip.WipWithExclusiveWebsocketChannelVmConnection;
+import com.jetbrains.debugger.wip.WipLocalVmConnection;
+import com.jetbrains.nodeJs.NodeJSFileFinder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.debugger.DebuggableRunConfiguration;
@@ -96,21 +95,18 @@ public class VSCodeRunConfiguration
       @NotNull final XDebugSession session,
       @Nullable final ExecutionResult executionResult,
       @NotNull final ExecutionEnvironment environment) {
-    final var connection = new WipWithExclusiveWebsocketChannelVmConnection();
-    connection.stateChanged(connectionState -> {
-      final var status = connectionState.getStatus();
-
-      if (status == ConnectionStatus.DISCONNECTED || status == ConnectionStatus.DETACHED) {
+    final var connection = new WipLocalVmConnection();
+    connection.stateChanged(state -> {
+      if (state.getStatus() == ConnectionStatus.DISCONNECTED) {
         onConnectionDisconnected(environment, Objects.requireNonNull(executionResult));
       }
 
       return null;
     });
 
-    final var fileFinder = new VSCodeLocalFileSystemFileFinder();
-    final var remoteFileFinder = new RemoteDebuggingFileFinder(ImmutableBiMap.of(), fileFinder);
-    final var process = new VSCodeDebugProcess(session, remoteFileFinder, connection, executionResult);
-    connection.open(socketAddress, null);
+    final var finder = new NodeJSFileFinder(environment.getProject());
+    final var process = new VSCodeDebugProcess(session, finder, connection, executionResult);
+    connection.open(socketAddress);
     return process;
   }
 

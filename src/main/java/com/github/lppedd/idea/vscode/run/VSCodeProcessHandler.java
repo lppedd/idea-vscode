@@ -18,11 +18,13 @@ public class VSCodeProcessHandler extends ColoredProcessHandler {
   public VSCodeProcessHandler(@NotNull final GeneralCommandLine commandLine) throws ExecutionException {
     super(commandLine);
     this.commandLine = commandLine;
+    setShouldKillProcessSoftly(false);
   }
 
   public VSCodeProcessHandler(@NotNull final VSCodeProcessHandler processHandler) {
     super(processHandler.getProcess(), processHandler.commandLine);
     this.commandLine = processHandler.commandLine;
+    setShouldKillProcessSoftly(false);
   }
 
   public void setTerminated() {

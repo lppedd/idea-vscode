@@ -4,13 +4,13 @@ import com.intellij.execution.ExecutionResult;
 import com.intellij.javascript.debugger.DebuggableFileFinder;
 import com.intellij.javascript.debugger.SyntheticSuspendBreakpointInfo;
 import com.intellij.xdebugger.XDebugSession;
-import com.jetbrains.debugger.wip.BrowserChromeDebugProcess;
+import com.jetbrains.nodeJs.NodeChromeDebugProcess;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.debugger.ExecutionStackView;
 import org.jetbrains.debugger.Script;
 import org.jetbrains.debugger.SuspendContext;
-import org.jetbrains.debugger.connection.VmConnection;
+import org.jetbrains.debugger.connection.RemoteVmConnection;
 import org.jetbrains.wip.WipVm;
 
 import java.util.Objects;
@@ -18,17 +18,17 @@ import java.util.Objects;
 /**
  * @author Edoardo Luppi
  */
-public class VSCodeDebugProcess extends BrowserChromeDebugProcess {
+public class VSCodeDebugProcess extends NodeChromeDebugProcess {
   public VSCodeDebugProcess(
       @NotNull final XDebugSession session,
       @NotNull final DebuggableFileFinder finder,
-      @NotNull final VmConnection<? extends WipVm> connection,
+      @NotNull final RemoteVmConnection<? extends WipVm> connection,
       @Nullable final ExecutionResult executionResult) {
     super(session, finder, connection, executionResult);
   }
 
   @Override
-  protected SyntheticSuspendBreakpointInfo getSyntheticSuspend(
+  protected @Nullable SyntheticSuspendBreakpointInfo getSyntheticSuspend(
       @NotNull final SuspendContext<?> context,
       @NotNull final Script script) {
     final var syntheticSuspend = super.getSyntheticSuspend(context, script);
