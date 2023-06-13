@@ -1,11 +1,11 @@
 plugins {
   id("java")
-  id("org.jetbrains.kotlin.jvm") version "1.8.21"
-  id("org.jetbrains.intellij") version "1.13.3"
+  id("org.jetbrains.kotlin.jvm") version "1.8.22"
+  id("org.jetbrains.intellij") version "1.14.1"
 }
 
 group = "com.github.lppedd"
-version = "0.0.2"
+version = "0.0.3"
 
 repositories {
   mavenCentral()
@@ -32,7 +32,7 @@ tasks {
   patchPluginXml {
     version.set(project.version.toString())
     sinceBuild.set("231")
-    untilBuild.set("232.*")
+    untilBuild.set("233.*")
   }
 
   runIde {
